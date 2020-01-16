@@ -19,28 +19,83 @@
             <img src="as2/as2_circuit.jpg" width=400></a>
         </p>
         <p>
-            3 LEDs, connected to pins 11, 12, and 13, blinking independently at 0.1 second intervals
+            A RGB LED connected to pins 11, 10, and 9, constantly fading and changing colour when the button is pushed
         </p>
 
         <p>
             <img src="as2/as2_schematic.jpg" width=400></a>
         </p>
         <p>
-            A parallel system of 3 LEDs with 220 Ohm resistors (since V=IR and all 3 LEDs have similiar voltage drops)
+            A RGB LED with three 220 Ohm resistors for each of its three pins (R=V/I=(5-1.8)/0.025=128 Ohms) and a pushbutton with a 10 KOhm resistor; I chose 10K because it is a safely high enough resistence so there would not be too much current in the circuit when the button is pushed.
         </p>
 
         <p>
             <img src="as2/as2_operation.gif" width=400></a>
         </p>
         <p>
-            Christmas lights in action!
+            Mesmerizing fading lights in action! Set to the beat of Three Degrees Summer by Philanthrope.
         </p>
 
         <p>
             Below is the Arduino code snippet:
         </p>
         <p>
-            <img src="as2/as2_code.png" width=400></a>
+            <pre>
+                <font color="#00979c">const</font> <font color="#00979c">int</font> <font color="#000000">buttonPin</font> <font color="#434f54">=</font> <font color="#000000">7</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; the pushbutton pin</font>
+                <font color="#00979c">const</font> <font color="#00979c">int</font> <font color="#000000">R</font> <font color="#434f54">=</font> <font color="#000000">11</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; the PWM pin the RGB LED is attached to</font>
+                <font color="#00979c">const</font> <font color="#00979c">int</font> <font color="#000000">G</font> <font color="#434f54">=</font> <font color="#000000">10</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; the PWM pin the RGB LED is attached to</font>
+                <font color="#00979c">const</font> <font color="#00979c">int</font> <font color="#000000">B</font> <font color="#434f54">=</font> <font color="#000000">9</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; the PWM pin the RGB LED is attached to</font>
+                
+                <font color="#434f54">&#47;&#47; variables will change:</font>
+                <font color="#00979c">int</font> <font color="#000000">buttonState</font> <font color="#434f54">=</font> <font color="#000000">0</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; variable for reading the pushbutton status</font>
+                
+                <font color="#434f54">&#47;&#47; the setup routine runs once when you press reset:</font>
+                <font color="#00979c">void</font> <font color="#5e6d03">setup</font><font color="#000000">(</font><font color="#000000">)</font> <font color="#000000">{</font>
+                 &nbsp;<font color="#434f54">&#47;&#47; initialize pushbutton pin as an input:</font>
+                 &nbsp;<font color="#d35400">pinMode</font><font color="#000000">(</font><font color="#000000">buttonPin</font><font color="#434f54">,</font> <font color="#00979c">INPUT</font><font color="#000000">)</font><font color="#000000">;</font>
+                 &nbsp;<font color="#434f54">&#47;&#47; initialize R pin as an output:</font>
+                 &nbsp;<font color="#d35400">pinMode</font><font color="#000000">(</font><font color="#000000">R</font><font color="#434f54">,</font> <font color="#00979c">OUTPUT</font><font color="#000000">)</font><font color="#000000">;</font>
+                 &nbsp;<font color="#434f54">&#47;&#47; initialize G pin as an output:</font>
+                 &nbsp;<font color="#d35400">pinMode</font><font color="#000000">(</font><font color="#000000">G</font><font color="#434f54">,</font> <font color="#00979c">OUTPUT</font><font color="#000000">)</font><font color="#000000">;</font>
+                 &nbsp;<font color="#434f54">&#47;&#47; initialize B pin as an output:</font>
+                 &nbsp;<font color="#d35400">pinMode</font><font color="#000000">(</font><font color="#000000">B</font><font color="#434f54">,</font> <font color="#00979c">OUTPUT</font><font color="#000000">)</font><font color="#000000">;</font>
+                <font color="#000000">}</font>
+                
+                <font color="#434f54">&#47;&#47; the loop routine runs over and over again forever:</font>
+                <font color="#00979c">void</font> <font color="#5e6d03">loop</font> <font color="#000000">(</font><font color="#000000">)</font><font color="#000000">{</font>
+                 &nbsp;<font color="#434f54">&#47;&#47; read the state of the pushbutton value:</font>
+                 &nbsp;<font color="#000000">buttonState</font> <font color="#434f54">=</font> <font color="#d35400">digitalRead</font><font color="#000000">(</font><font color="#000000">buttonPin</font><font color="#000000">)</font><font color="#000000">;</font>
+                
+                 &nbsp;<font color="#434f54">&#47;&#47; check if the pushbutton is pressed. If it is, the buttonState is HIGH:</font>
+                 &nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><font color="#000000">buttonState</font> <font color="#434f54">==</font> <font color="#00979c">HIGH</font><font color="#000000">)</font> <font color="#000000">{</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; for-loop fading effect for R pin (set to the beat of Three Degrees Summer by Philanthrope)</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#5e6d03">for</font><font color="#000000">(</font><font color="#00979c">int</font> <font color="#000000">i</font> <font color="#434f54">=</font> <font color="#000000">0</font><font color="#000000">;</font> <font color="#000000">i</font> <font color="#434f54">&lt;</font> <font color="#000000">146</font><font color="#000000">;</font><font color="#000000">i</font><font color="#434f54">++</font><font color="#000000">)</font><font color="#000000">{</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; set the brightness of pin:</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#d35400">analogWrite</font><font color="#000000">(</font><font color="#000000">R</font><font color="#434f54">,</font> <font color="#000000">i</font><font color="#000000">)</font><font color="#000000">;</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; wait for 10 milliseconds to see the fading effect </font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#d35400">delay</font><font color="#000000">(</font><font color="#000000">10</font><font color="#000000">)</font><font color="#000000">;</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#000000">}</font>
+                
+                 &nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47;repeat for-loop for G pin</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#5e6d03">for</font><font color="#000000">(</font><font color="#00979c">int</font> <font color="#000000">i</font> <font color="#434f54">=</font> <font color="#000000">0</font><font color="#000000">;</font> <font color="#000000">i</font> <font color="#434f54">&lt;</font> <font color="#000000">146</font><font color="#000000">;</font><font color="#000000">i</font><font color="#434f54">++</font><font color="#000000">)</font><font color="#000000">{</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#d35400">analogWrite</font><font color="#000000">(</font><font color="#000000">G</font><font color="#434f54">,</font> <font color="#000000">i</font><font color="#000000">)</font><font color="#000000">;</font> 
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#d35400">delay</font><font color="#000000">(</font><font color="#000000">10</font><font color="#000000">)</font><font color="#000000">;</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#000000">}</font>
+                
+                 &nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47;repeat for-loop for B pin</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#5e6d03">for</font><font color="#000000">(</font><font color="#00979c">int</font> <font color="#000000">i</font> <font color="#434f54">=</font> <font color="#000000">0</font><font color="#000000">;</font> <font color="#000000">i</font> <font color="#434f54">&lt;</font> <font color="#000000">146</font><font color="#000000">;</font><font color="#000000">i</font><font color="#434f54">++</font><font color="#000000">)</font><font color="#000000">{</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#d35400">analogWrite</font><font color="#000000">(</font><font color="#000000">B</font><font color="#434f54">,</font> <font color="#000000">i</font><font color="#000000">)</font><font color="#000000">;</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#d35400">delay</font><font color="#000000">(</font><font color="#000000">10</font><font color="#000000">)</font><font color="#000000">;</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#000000">}</font> &nbsp;
+                 &nbsp;<font color="#000000">}</font> <font color="#5e6d03">else</font> <font color="#000000">{</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; turn LED off:</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#d35400">digitalWrite</font><font color="#000000">(</font><font color="#000000">R</font><font color="#434f54">,</font> <font color="#00979c">LOW</font><font color="#000000">)</font><font color="#000000">;</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#d35400">digitalWrite</font><font color="#000000">(</font><font color="#000000">G</font><font color="#434f54">,</font> <font color="#00979c">LOW</font><font color="#000000">)</font><font color="#000000">;</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#d35400">digitalWrite</font><font color="#000000">(</font><font color="#000000">B</font><font color="#434f54">,</font> <font color="#00979c">LOW</font><font color="#000000">)</font><font color="#000000">;</font>
+                 &nbsp;<font color="#000000">}</font>
+                <font color="#000000">}</font>
+                
+                </pre>
         </p>
     </div>
 
