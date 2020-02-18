@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0" />
+
+    <title>Jesse Du's HCDE 439 Physical Computing Page!</title>
+
+    <link href="style.css" media="screen" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>Jesse Du's Assignment 4!</h1>
+        <p>
+            <img src="as4/as4_circuit.jpg" width=400></a>
+        </p>
+        <p>
+            A LED strip connected to an external power source and a N-MOSFET transistor in turn connected to analog pin 9; a separate IR receiver module connected to pin 9 and Arduino's 5V power source.
+        </p>
+
+        <p>
+            <img src="as4/as4_schematic.jpg" width=400></a>
+        </p>
+        <p>
+            
+        </p>
+
+        <p>
+            <img src="as4/as4_operation.gif" width=400></a>
+        </p>
+        <p>
+            LED light turns on with fading effect as I press the remote's power key.
+        </p>
+
+        <p>
+            Below is the Arduino code snippet:
+        </p>
+        <p>
+            <pre>
+                <font color="#5e6d03">#include</font> <font color="#434f54">&lt;</font><font color="#000000">IRremote</font><font color="#434f54">.</font><font color="#000000">h</font><font color="#434f54">&gt;</font> &nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; install IR remote library</font>
+                
+                <font color="#00979c">const</font> <font color="#00979c">int</font> <font color="#000000">RECV_PIN</font> <font color="#434f54">=</font> <font color="#000000">9</font><font color="#000000">;</font> &nbsp;&nbsp;<font color="#434f54">&#47;&#47; PWM pin for IR receiver module</font>
+                <b><font color="#d35400">IRrecv</font></b> <font color="#000000">irrecv</font><font color="#000000">(</font><font color="#000000">RECV_PIN</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;<font color="#434f54">&#47;&#47; create irrecv object and specify reveicer pin number</font>
+                <b><font color="#d35400">decode_results</font></b> <font color="#000000">results</font><font color="#000000">;</font> &nbsp;&nbsp;<font color="#434f54">&#47;&#47; create results object</font>
+                <font color="#00979c">unsigned</font> <font color="#00979c">long</font> <font color="#000000">key_value</font> <font color="#434f54">=</font> <font color="#000000">0</font><font color="#000000">;</font> &nbsp;<font color="#434f54">&#47;&#47;create key value object for remote commands</font>
+                
+                <font color="#00979c">int</font> <font color="#000000">led</font> <font color="#434f54">=</font> <font color="#000000">11</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; PWM pin the LED is attached to</font>
+                <font color="#00979c">int</font> <font color="#000000">brightness</font> <font color="#434f54">=</font> <font color="#000000">10</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; how bright the LED is</font>
+                <font color="#00979c">int</font> <font color="#000000">fadeAmount</font> <font color="#434f54">=</font> <font color="#000000">5</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; how many points to fade the LED by</font>
+                
+                <font color="#434f54">&#47;&#47; the setup routine runs once when you press reset:</font>
+                <font color="#00979c">void</font> <font color="#5e6d03">setup</font><font color="#000000">(</font><font color="#000000">)</font> <font color="#000000">{</font>
+                 &nbsp;<font color="#434f54">&#47;&#47; declare LED pin to be an output</font>
+                 &nbsp;<font color="#d35400">pinMode</font><font color="#000000">(</font><font color="#000000">led</font><font color="#434f54">,</font> <font color="#00979c">OUTPUT</font><font color="#000000">)</font><font color="#000000">;</font>
+                 &nbsp;<font color="#434f54">&#47;&#47; set up IR receiver module</font>
+                 &nbsp;<b><font color="#d35400">Serial</font></b><font color="#434f54">.</font><font color="#d35400">begin</font><font color="#000000">(</font><font color="#000000">9600</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; configure serial monitor baud rate</font>
+                 &nbsp;<font color="#000000">irrecv</font><font color="#434f54">.</font><font color="#d35400">enableIRIn</font><font color="#000000">(</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; start IR receiver module</font>
+                 &nbsp;<font color="#000000">irrecv</font><font color="#434f54">.</font><font color="#d35400">blink13</font><font color="#000000">(</font><font color="#00979c">true</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;<font color="#434f54">&#47;&#47; set up Arduino on-board LED to blink when receiving signal</font>
+                <font color="#000000">}</font>
+                
+                <font color="#434f54">&#47;&#47; the loop routine runs over and over again forever:</font>
+                <font color="#00979c">void</font> <font color="#5e6d03">loop</font><font color="#000000">(</font><font color="#000000">)</font> <font color="#000000">{</font>
+                 &nbsp;<font color="#434f54">&#47;&#47; if IR receiver receives a signal</font>
+                 &nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><font color="#000000">irrecv</font><font color="#434f54">.</font><font color="#d35400">decode</font><font color="#000000">(</font><font color="#434f54">&amp;</font><font color="#000000">results</font><font color="#000000">)</font><font color="#000000">)</font><font color="#000000">{</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; if a key is pressed repeatedly</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><font color="#000000">results</font><font color="#434f54">.</font><font color="#000000">value</font> <font color="#434f54">==</font> <font color="#000000">0XFFFFFFFF</font><font color="#000000">)</font><font color="#000000">{</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; 0XFFFFFFFF code means repition of previous key</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#000000">results</font><font color="#434f54">.</font><font color="#000000">value</font> <font color="#434f54">=</font> <font color="#000000">key_value</font><font color="#000000">;</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#000000">}</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; starts LED action depending on signal</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#5e6d03">switch</font><font color="#000000">(</font><font color="#000000">results</font><font color="#434f54">.</font><font color="#000000">value</font><font color="#000000">)</font><font color="#000000">{</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#5e6d03">case</font> <font color="#000000">0xFFA25D</font><font color="#434f54">:</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; corresponding HEX code for power key</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; turns on LED with fading pattern </font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#d35400">analogWrite</font><font color="#000000">(</font><font color="#000000">led</font><font color="#434f54">,</font> <font color="#000000">brightness</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; set brightness of LED</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; change brightness for next time</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#000000">brightness</font> <font color="#434f54">=</font> <font color="#000000">brightness</font> <font color="#434f54">+</font> <font color="#000000">fadeAmount</font><font color="#000000">;</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; reverse direction of fading at ends of fade</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><font color="#000000">brightness</font> <font color="#434f54">&lt;=</font> <font color="#000000">0</font> <font color="#434f54">||</font> <font color="#000000">brightness</font> <font color="#434f54">&gt;=</font> <font color="#000000">255</font><font color="#000000">)</font> <font color="#000000">{</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#000000">fadeAmount</font> <font color="#434f54">=</font> <font color="#434f54">-</font><font color="#000000">fadeAmount</font><font color="#000000">;</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#000000">}</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#d35400">delay</font><font color="#000000">(</font><font color="#000000">30</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; wait for 30 milliseconds to see dimming effect</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b><font color="#d35400">Serial</font></b><font color="#434f54">.</font><font color="#d35400">println</font><font color="#000000">(</font><font color="#005c5f">&#34;POWER&#34;</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; print key to serial monitor</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#5e6d03">break</font> <font color="#000000">;</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#5e6d03">default</font><font color="#434f54">:</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b><font color="#d35400">Serial</font></b><font color="#434f54">.</font><font color="#d35400">println</font><font color="#000000">(</font><font color="#005c5f">&#34;other button&#34;</font><font color="#000000">)</font><font color="#000000">;</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#5e6d03">break</font> <font color="#000000">;</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#000000">}</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#000000">key_value</font> <font color="#434f54">=</font> <font color="#000000">results</font><font color="#434f54">.</font><font color="#000000">value</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; key code stored in global variable key_value</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#000000">irrecv</font><font color="#434f54">.</font><font color="#d35400">resume</font><font color="#000000">(</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; reset IR receiver</font>
+                 &nbsp;<font color="#000000">}</font>
+                <font color="#000000">}</font>
+                
+                </pre>
+        </p>
+    </div>
+
+</body>
+
+</html>
