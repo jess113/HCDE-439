@@ -6,7 +6,7 @@ decode_results results;   // create results object
 unsigned long key_value = 0;  //create key value object for remote commands
 
 int led = 11;             // PWM pin the LED is attached to
-int brightness = 10;       // how bright the LED is
+int brightness = 0;       // how bright the LED is
 int fadeAmount = 5;       // how many points to fade the LED by
 
 // the setup routine runs once when you press reset:
@@ -27,22 +27,25 @@ void loop() {
       if (results.value == 0XFFFFFFFF){      // 0XFFFFFFFF code means repition of previous key
           results.value = key_value;
       }
+      // create sensorValue to store current state of LED (to turn it on or off)
+      int sensorValue = 0;
+      sensorValue = digitalRead(led);
+      
       // starts LED action depending on signal
       switch(results.value){
-          case 0xFFA25D:                     // corresponding HEX code for power key
-          // turns on LED with fading pattern 
-          analogWrite(led, brightness);      // set brightness of LED
-          // change brightness for next time
-          brightness = brightness + fadeAmount;
-          // reverse direction of fading at ends of fade
-          if (brightness <= 0 || brightness >= 255) {
-             fadeAmount = -fadeAmount;
-          }
-          delay(30);                         // wait for 30 milliseconds to see dimming effect
-          Serial.println("POWER");           // print key to serial monitor
-          break ;
+          case 0xFFA25D:                      // corresponding HEX code for power key
+              if (sensorValue == 0){
+                  Serial.println("POWER ON");        // print key to serial monitor
+                  analogWrite(led, 255);             // LED on
+                  break ;
+              }
+              if (sensorValue == 1) {
+                  Serial.println("POWER OFF");       // print key to serial monitor
+                  analogWrite(led, 0);               // LED off
+                  break ;
+              }
           default:
-          Serial.println("other button");
+          Serial.println("other button");    // print to serial monitor if not power key
           break ;
       }
       key_value = results.value;             // key code stored in global variable key_value
