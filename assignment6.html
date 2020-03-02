@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0" />
+
+    <title>Jesse Du's HCDE 439 Physical Computing Page!</title>
+
+    <link href="style.css" media="screen" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>Jesse Du's Assignment 5!</h1>
+        <p>
+            <img src="as6/as6_circuit.jpg" width=400></a>
+        </p>
+        <p>
+            A joystick module connected to the Arduino board with Dupont wires (ground, 5V, VRx to pin A0, VRy to pin A1, and switch to pin 2). A separate red LEG with 220 Ohm resistor connected to pin 8 and ground.
+        </p>
+
+        <p>
+            <img src="as6/as6_schematic.jpg" width=400></a>
+        </p>
+        <p>
+            I chose a 220 Ohm resistor for the red LED as calculated from Ohm's Law (R=V/I=(5-1.8)/0.025=128 Ohms). The joystick does not require external resistor as it is essentially two potentiometres.
+        </p>
+
+        <p>
+            <img src="as6/as6_operation.gif" width=400></a>
+        </p>
+        <p>
+            A square on the monitor can be moved around with the joystrick. The LED blinks whenever the joystick is moved; pressing any key on the keyboard will turn the LED off.
+        </p>
+
+        <p>
+            Below is the Arduino code snippet:
+        </p>
+        <p>
+            <pre>
+                <font color="#00979c">int</font> <font color="#000000">ledPin</font> <font color="#434f54">=</font> <font color="#000000">8</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; LED connected to digital pin 8</font>
+                <font color="#00979c">int</font> <font color="#000000">VRx</font> <font color="#434f54">=</font> <font color="#000000">0</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; joystick slider variable connecetd to analog pin 0</font>
+                <font color="#00979c">int</font> <font color="#000000">VRy</font> <font color="#434f54">=</font> <font color="#000000">1</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; joystick slider variable connecetd to analog pin 1</font>
+                <font color="#00979c">int</font> <font color="#000000">valueX</font> <font color="#434f54">=</font> <font color="#000000">0</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; variable to read sensor value from the analog pin 0</font>
+                <font color="#00979c">int</font> <font color="#000000">valueY</font> <font color="#434f54">=</font> <font color="#000000">0</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; variable to read sensor value from the analog pin 1</font>
+               
+                <font color="#434f54">&#47;&#47; setup code to run once</font>
+                <font color="#00979c">void</font> <font color="#5e6d03">setup</font><font color="#000000">(</font><font color="#000000">)</font> <font color="#000000">{</font>
+                &nbsp;<font color="#d35400">pinMode</font><font color="#000000">(</font><font color="#000000">ledPin</font><font color="#434f54">,</font> <font color="#00979c">OUTPUT</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; initialize LED pin as output</font>
+                &nbsp;<b><font color="#d35400">Serial</font></b><font color="#434f54">.</font><font color="#d35400">begin</font><font color="#000000">(</font><font color="#000000">9600</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; initialize serial communications</font>
+                &nbsp;<b><font color="#d35400">Serial</font></b><font color="#434f54">.</font><font color="#d35400">setTimeout</font><font color="#000000">(</font><font color="#000000">10</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; set the timeout for parseInt</font>
+                <font color="#000000">}</font>
+               
+                <font color="#434f54">&#47;&#47; function to map sensor data to numbers suitable for canvas drawing</font>
+                <font color="#00979c">int</font> <font color="#000000">treatValue</font><font color="#000000">(</font><font color="#00979c">int</font> <font color="#000000">data</font><font color="#000000">)</font> <font color="#000000">{</font>
+                &nbsp;<font color="#5e6d03">return</font> <font color="#000000">data</font> <font color="#434f54">=</font> <font color="#d35400">map</font><font color="#000000">(</font><font color="#000000">data</font><font color="#434f54">,</font> <font color="#000000">0</font><font color="#434f54">,</font> <font color="#000000">1023</font><font color="#434f54">,</font> <font color="#000000">0</font><font color="#434f54">,</font> <font color="#000000">400</font><font color="#000000">)</font><font color="#000000">;</font>
+                <font color="#000000">}</font>
+               
+                <font color="#434f54">&#47;&#47; main code to run repeatedly</font>
+                <font color="#00979c">void</font> <font color="#5e6d03">loop</font><font color="#000000">(</font><font color="#000000">)</font> <font color="#000000">{</font>
+                &nbsp;<font color="#434f54">&#47;&#47; read sensor values of the variable resistors</font>
+                &nbsp;<font color="#000000">valueX</font> <font color="#434f54">=</font> <font color="#d35400">analogRead</font><font color="#000000">(</font><font color="#000000">VRx</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;<font color="#000000">valueY</font> <font color="#434f54">=</font> <font color="#d35400">analogRead</font><font color="#000000">(</font><font color="#000000">VRy</font><font color="#000000">)</font><font color="#000000">;</font>
+               
+                &nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><b><font color="#d35400">Serial</font></b><font color="#434f54">.</font><font color="#d35400">available</font><font color="#000000">(</font><font color="#000000">)</font><font color="#000000">)</font> <font color="#000000">{</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; check if there is serial data </font>
+                &nbsp;&nbsp;&nbsp;<font color="#d35400">digitalWrite</font><font color="#000000">(</font><font color="#000000">ledPin</font><font color="#434f54">,</font> <font color="#00979c">LOW</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; turn off LED</font>
+                &nbsp;<font color="#000000">}</font> <font color="#5e6d03">else</font> <font color="#000000">{</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; if no serial data is received</font>
+                &nbsp;&nbsp;&nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><font color="#000000">(</font><font color="#000000">valueX</font> <font color="#434f54">&gt;=</font> <font color="#000000">494</font> <font color="#434f54">&amp;&amp;</font> <font color="#000000">valueX</font> <font color="#434f54">&lt;=</font> <font color="#000000">504</font><font color="#000000">)</font> <font color="#434f54">&amp;&amp;</font> <font color="#000000">(</font><font color="#000000">valueY</font> <font color="#434f54">&gt;=</font> <font color="#000000">504</font> <font color="#434f54">&amp;&amp;</font> <font color="#000000">valueY</font> <font color="#434f54">&lt;=</font> <font color="#000000">514</font><font color="#000000">)</font><font color="#000000">)</font> <font color="#000000">{</font> <font color="#434f54">&#47;&#47; turn LED on when moving joystick</font>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#d35400">digitalWrite</font><font color="#000000">(</font><font color="#000000">ledPin</font><font color="#434f54">,</font> <font color="#00979c">LOW</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; LED remains off when in joystick in resting position (estimated [494-504, 504-514])</font>
+                &nbsp;&nbsp;&nbsp;<font color="#000000">}</font> <font color="#5e6d03">else</font> <font color="#000000">{</font>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#d35400">digitalWrite</font><font color="#000000">(</font><font color="#000000">ledPin</font><font color="#434f54">,</font> <font color="#00979c">HIGH</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;<font color="#434f54">&#47;&#47; LED on when joystick not in resting position</font>
+                &nbsp;&nbsp;&nbsp;<font color="#000000">}</font>
+                &nbsp;<font color="#000000">}</font>
+                &nbsp;
+                &nbsp;<font color="#434f54">&#47;&#47; send an array of the two values to serialport</font>
+                &nbsp;<b><font color="#d35400">Serial</font></b><font color="#434f54">.</font><font color="#d35400">print</font><font color="#000000">(</font><font color="#00979c">&#39;[&#39;</font><font color="#000000">)</font><font color="#000000">;</font>
+                &nbsp;<b><font color="#d35400">Serial</font></b><font color="#434f54">.</font><font color="#d35400">print</font><font color="#000000">(</font><font color="#000000">treatValue</font><font color="#000000">(</font><font color="#000000">valueX</font><font color="#000000">)</font><font color="#000000">)</font><font color="#000000">;</font>
+                &nbsp;<b><font color="#d35400">Serial</font></b><font color="#434f54">.</font><font color="#d35400">print</font><font color="#000000">(</font><font color="#00979c">&#39;,&#39;</font><font color="#000000">)</font><font color="#000000">;</font>
+                &nbsp;<b><font color="#d35400">Serial</font></b><font color="#434f54">.</font><font color="#d35400">print</font><font color="#000000">(</font><font color="#000000">treatValue</font><font color="#000000">(</font><font color="#000000">valueY</font><font color="#000000">)</font><font color="#000000">)</font><font color="#000000">;</font>
+                &nbsp;<b><font color="#d35400">Serial</font></b><font color="#434f54">.</font><font color="#d35400">println</font><font color="#000000">(</font><font color="#00979c">&#39;]&#39;</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; write last bracket followed by ‘\r’ carriage return and ‘\n’ line feed characters</font>
+                <font color="#000000">}</font>
+               
+            </pre>
+        </p>
+        <p>
+            Below is the p5.js code snippet from sketch.js:
+        </p>
+        <p>
+            <pre>
+                <font color="#000000">var</font> <font color="#000000">serial</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; variable to hold an instance of the serialport library</font>
+                <font color="#000000">var</font> <font color="#000000">portName</font> <font color="#434f54">=</font> <font color="#000000">&#39;COM3&#39;</font> <font color="#434f54">&#47;&#47; name of serialport</font>
+                <font color="#000000">var</font> <font color="#000000">datastring</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; data string coming in over serial</font>
+                
+                <font color="#000000">var</font> <font color="#000000">dataarray</font> <font color="#434f54">=</font> <font color="#000000">[</font><font color="#000000">0</font><font color="#434f54">,</font> <font color="#000000">0</font><font color="#000000">]</font><font color="#000000">;</font> <font color="#434f54">&#47;&#47; declare dataarray</font>
+                
+                <font color="#000000">var</font> <font color="#000000">minWidth</font> <font color="#434f54">=</font> <font color="#000000">600</font><font color="#000000">;</font> &nbsp;&nbsp;<font color="#434f54">&#47;&#47; set min width for canvas</font>
+                <font color="#000000">var</font> <font color="#000000">minHeight</font> <font color="#434f54">=</font> <font color="#000000">400</font><font color="#000000">;</font> &nbsp;<font color="#434f54">&#47;&#47; set min hieght for canvas</font>
+                <font color="#000000">var</font> <font color="#000000">width</font><font color="#434f54">,</font> <font color="#000000">height</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; actual width and height for the sketch</font>
+                
+                <font color="#000000">function</font> <font color="#5e6d03">setup</font><font color="#000000">(</font><font color="#000000">)</font> <font color="#000000">{</font>
+                 &nbsp;<font color="#000000">serial</font> <font color="#434f54">=</font> <font color="#00979c">new</font> <font color="#000000">p5</font><font color="#434f54">.</font><font color="#000000">SerialPort</font><font color="#000000">(</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; make a new instance of the serialport library</font>
+                 &nbsp;<font color="#000000">serial</font><font color="#434f54">.</font><font color="#000000">on</font><font color="#000000">(</font><font color="#000000">&#39;list&#39;</font><font color="#434f54">,</font> <font color="#000000">printList</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; set a callback function for the serialport list event</font>
+                 &nbsp;<font color="#000000">serial</font><font color="#434f54">.</font><font color="#000000">on</font><font color="#000000">(</font><font color="#000000">&#39;connected&#39;</font><font color="#434f54">,</font> <font color="#000000">serverConnected</font><font color="#000000">)</font><font color="#000000">;</font> <font color="#434f54">&#47;&#47; callback for connecting to the server</font>
+                 &nbsp;<font color="#000000">serial</font><font color="#434f54">.</font><font color="#000000">on</font><font color="#000000">(</font><font color="#000000">&#39;open&#39;</font><font color="#434f54">,</font> <font color="#000000">portOpen</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; callback for the port opening</font>
+                 &nbsp;<font color="#000000">serial</font><font color="#434f54">.</font><font color="#000000">on</font><font color="#000000">(</font><font color="#000000">&#39;data&#39;</font><font color="#434f54">,</font> <font color="#000000">serialEvent</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; callback for when new data arrives</font>
+                 &nbsp;<font color="#000000">serial</font><font color="#434f54">.</font><font color="#000000">on</font><font color="#000000">(</font><font color="#000000">&#39;error&#39;</font><font color="#434f54">,</font> <font color="#000000">serialError</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; callback for errors</font>
+                 &nbsp;<font color="#000000">serial</font><font color="#434f54">.</font><font color="#000000">on</font><font color="#000000">(</font><font color="#000000">&#39;close&#39;</font><font color="#434f54">,</font> <font color="#000000">portClose</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; callback for the port closing</font>
+                
+                 &nbsp;<font color="#000000">serial</font><font color="#434f54">.</font><font color="#000000">list</font><font color="#000000">(</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; list the serial ports</font>
+                 &nbsp;<font color="#000000">serial</font><font color="#434f54">.</font><font color="#d35400">open</font><font color="#000000">(</font><font color="#000000">portName</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; open a serial port</font>
+                
+                 &nbsp;<font color="#434f54">&#47;&#47; set the canvas to match the window size</font>
+                 &nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><font color="#000000">window</font><font color="#434f54">.</font><font color="#000000">innerWidth</font> <font color="#434f54">&gt;</font> <font color="#000000">minWidth</font><font color="#000000">)</font> <font color="#000000">{</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#000000">width</font> <font color="#434f54">=</font> <font color="#000000">window</font><font color="#434f54">.</font><font color="#000000">innerWidth</font><font color="#000000">;</font>
+                 &nbsp;<font color="#000000">}</font> <font color="#5e6d03">else</font> <font color="#000000">{</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#000000">width</font> <font color="#434f54">=</font> <font color="#000000">minWidth</font><font color="#000000">;</font>
+                 &nbsp;<font color="#000000">}</font>
+                 &nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><font color="#000000">window</font><font color="#434f54">.</font><font color="#000000">innerHeight</font> <font color="#434f54">&gt;</font> <font color="#000000">minHeight</font><font color="#000000">)</font> <font color="#000000">{</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#000000">height</font> <font color="#434f54">=</font> <font color="#000000">window</font><font color="#434f54">.</font><font color="#000000">innerHeight</font><font color="#000000">;</font>
+                 &nbsp;<font color="#000000">}</font> <font color="#5e6d03">else</font> <font color="#000000">{</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#000000">height</font> <font color="#434f54">=</font> <font color="#000000">minHeight</font><font color="#000000">;</font>
+                 &nbsp;<font color="#000000">}</font>
+                 &nbsp;<font color="#434f54">&#47;&#47; set up actual canvas</font>
+                 &nbsp;<font color="#000000">createCanvas</font><font color="#000000">(</font><font color="#000000">width</font><font color="#434f54">,</font> <font color="#000000">height</font><font color="#000000">)</font><font color="#000000">;</font>
+                <font color="#000000">}</font>
+                
+                <font color="#434f54">&#47;&#47; following functions print the serial communication status to the console for debugging</font>
+                <font color="#000000">function</font> <font color="#000000">printList</font><font color="#000000">(</font><font color="#000000">portList</font><font color="#000000">)</font> <font color="#000000">{</font>
+                 &nbsp;<font color="#5e6d03">for</font> <font color="#000000">(</font><font color="#000000">var</font> <font color="#000000">i</font> <font color="#434f54">=</font> <font color="#000000">0</font><font color="#000000">;</font> <font color="#000000">i</font> <font color="#434f54">&lt;</font> <font color="#000000">portList</font><font color="#434f54">.</font><font color="#d35400">length</font><font color="#000000">;</font> <font color="#000000">i</font><font color="#434f54">++</font><font color="#000000">)</font> <font color="#000000">{</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#d35400">print</font><font color="#000000">(</font><font color="#000000">i</font> <font color="#434f54">+</font> <font color="#005c5f">&#34; &#34;</font> <font color="#434f54">+</font> <font color="#000000">portList</font><font color="#000000">[</font><font color="#000000">i</font><font color="#000000">]</font><font color="#000000">)</font><font color="#000000">;</font>
+                 &nbsp;<font color="#000000">}</font>
+                <font color="#000000">}</font>
+                <font color="#000000">function</font> <font color="#000000">serverConnected</font><font color="#000000">(</font><font color="#000000">)</font> <font color="#000000">{</font>
+                 &nbsp;<font color="#d35400">print</font><font color="#000000">(</font><font color="#000000">&#39;connected to server.&#39;</font><font color="#000000">)</font><font color="#000000">;</font>
+                <font color="#000000">}</font>
+                <font color="#000000">function</font> <font color="#000000">portOpen</font><font color="#000000">(</font><font color="#000000">)</font> <font color="#000000">{</font>
+                 &nbsp;<font color="#d35400">print</font><font color="#000000">(</font><font color="#000000">&#39;the serial port opened.&#39;</font><font color="#000000">)</font>
+                <font color="#000000">}</font>
+                <font color="#000000">function</font> <font color="#000000">serialError</font><font color="#000000">(</font><font color="#000000">err</font><font color="#000000">)</font> <font color="#000000">{</font>
+                 &nbsp;<font color="#d35400">print</font><font color="#000000">(</font><font color="#000000">&#39;Something went wrong with the serial port. &#39;</font> <font color="#434f54">+</font> <font color="#000000">err</font><font color="#000000">)</font><font color="#000000">;</font>
+                <font color="#000000">}</font>
+                <font color="#000000">function</font> <font color="#000000">portClose</font><font color="#000000">(</font><font color="#000000">)</font> <font color="#000000">{</font>
+                 &nbsp;<font color="#d35400">print</font><font color="#000000">(</font><font color="#000000">&#39;The serial port closed.&#39;</font><font color="#000000">)</font><font color="#000000">;</font>
+                <font color="#000000">}</font>
+                <font color="#434f54">&#47;&#47; read data from serial</font>
+                <font color="#000000">function</font> <font color="#000000">serialEvent</font><font color="#000000">(</font><font color="#000000">)</font> <font color="#000000">{</font>
+                 &nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><font color="#000000">serial</font><font color="#434f54">.</font><font color="#d35400">available</font><font color="#000000">(</font><font color="#000000">)</font><font color="#000000">)</font> <font color="#000000">{</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; check if there is data over serial</font>
+                 &nbsp;<font color="#000000">datastring</font> <font color="#434f54">=</font> <font color="#000000">serial</font><font color="#434f54">.</font><font color="#000000">readLine</font><font color="#000000">(</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; read data string line by line</font>
+                 &nbsp;<font color="#000000">var</font> <font color="#000000">newarray</font><font color="#000000">;</font>
+                 &nbsp;<font color="#5e6d03">try</font> <font color="#000000">{</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#000000">newarray</font> <font color="#434f54">=</font> <font color="#000000">JSON</font><font color="#434f54">.</font><font color="#d35400">parse</font><font color="#000000">(</font><font color="#000000">datastring</font><font color="#000000">)</font><font color="#000000">;</font> <font color="#434f54">&#47;&#47; try parse the serial with JSON</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#000000">}</font> <font color="#5e6d03">catch</font><font color="#000000">(</font><font color="#000000">err</font><font color="#000000">)</font> <font color="#000000">{</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#000000">console</font><font color="#434f54">.</font><font color="#d35400">log</font><font color="#000000">(</font><font color="#000000">err</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; log JSON error to console</font>
+                 &nbsp;<font color="#000000">}</font>
+                 &nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><font color="#000000">typeof</font><font color="#000000">(</font><font color="#000000">newarray</font><font color="#000000">)</font> <font color="#434f54">==</font> <font color="#000000">&#39;object&#39;</font><font color="#000000">)</font> <font color="#000000">{</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#000000">dataarray</font> <font color="#434f54">=</font> <font color="#000000">newarray</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; store received data in an array </font>
+                 &nbsp;<font color="#000000">}</font>
+                 &nbsp;<font color="#000000">console</font><font color="#434f54">.</font><font color="#d35400">log</font><font color="#000000">(</font><font color="#005c5f">&#34;got back &#34;</font> <font color="#434f54">+</font> <font color="#000000">datastring</font><font color="#000000">)</font><font color="#000000">;</font> <font color="#434f54">&#47;&#47; log received array to console</font>
+                 &nbsp;<font color="#000000">}</font>
+                <font color="#000000">}</font>
+                <font color="#434f54">&#47;&#47; serial communication to Arduino</font>
+                <font color="#000000">function</font> <font color="#000000">keyPressed</font><font color="#000000">(</font><font color="#000000">)</font> <font color="#000000">{</font>
+                 &nbsp;<font color="#000000">console</font><font color="#434f54">.</font><font color="#d35400">log</font><font color="#000000">(</font><font color="#005c5f">&#34;writing key&#34;</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; log event to console</font>
+                 &nbsp;<font color="#000000">serial</font><font color="#434f54">.</font><font color="#d35400">write</font><font color="#000000">(</font><font color="#000000">key</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; send pressed key over serial</font>
+                <font color="#000000">}</font>
+                
+                <font color="#434f54">&#47;&#47; draw square canvas based on Arduino data</font>
+                <font color="#000000">function</font> <font color="#000000">draw</font><font color="#000000">(</font><font color="#000000">)</font> <font color="#000000">{</font>
+                 &nbsp;<font color="#000000">background</font><font color="#000000">(</font><font color="#000000">0x08</font><font color="#434f54">,</font> <font color="#000000">0x16</font><font color="#434f54">,</font> <font color="#000000">0x40</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; set background colour</font>
+                 &nbsp;<font color="#000000">fill</font><font color="#000000">(</font><font color="#000000">255</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; set fill colour</font>
+                 &nbsp;<font color="#000000">text</font><font color="#000000">(</font><font color="#005c5f">&#34;PRESS ANY KEY TO TURN OFF LED&#34;</font><font color="#434f54">,</font> <font color="#000000">55</font><font color="#434f54">,</font> <font color="#000000">30</font><font color="#000000">)</font><font color="#000000">;</font> <font color="#434f54">&#47;&#47; write text on canvas</font>
+                 &nbsp;<font color="#000000">rect</font><font color="#000000">(</font><font color="#000000">dataarray</font><font color="#000000">[</font><font color="#000000">0</font><font color="#000000">]</font><font color="#434f54">,</font><font color="#000000">dataarray</font><font color="#000000">[</font><font color="#000000">1</font><font color="#000000">]</font><font color="#434f54">,</font><font color="#000000">50</font><font color="#434f54">,</font><font color="#000000">50</font><font color="#000000">)</font><font color="#000000">;</font> <font color="#434f54">&#47;&#47; draw 50x50 square whose position is controlled by Arduino data</font>
+                <font color="#000000">}</font>
+                
+                </pre>
+        </p>
+    </div>
+
+</body>
+
+</html>
