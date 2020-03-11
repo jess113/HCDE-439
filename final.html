@@ -44,101 +44,85 @@
         </p>
         <p>
             <pre>
+                <font color="#5e6d03">#include</font> <font color="#005c5f">&#34;Mouse.h&#34;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; import Mouse library for Arduino Leonardo</font>
+                
+                <font color="#434f54">&#47;&#47; set input pins and parametres</font>
+                <font color="#00979c">const</font> <font color="#00979c">int</font> <font color="#000000">pushPin</font> <font color="#434f54">=</font> <font color="#000000">2</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; pushbutton to turn on and off mouse control</font>
+                <font color="#00979c">const</font> <font color="#00979c">int</font> <font color="#000000">mouseButton</font> <font color="#434f54">=</font> <font color="#000000">3</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; joystick pushbutton</font>
+                <font color="#00979c">const</font> <font color="#00979c">int</font> <font color="#000000">xAxis</font> <font color="#434f54">=</font> <font color="#000000">A0</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; joystick X axis</font>
+                <font color="#00979c">const</font> <font color="#00979c">int</font> <font color="#000000">yAxis</font> <font color="#434f54">=</font> <font color="#000000">A1</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; joystick Y axis</font>
+                <font color="#00979c">const</font> <font color="#00979c">int</font> <font color="#000000">ledPin</font> <font color="#434f54">=</font> <font color="#000000">5</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; LED indicating mouse control</font>
+                
+                <font color="#00979c">int</font> <font color="#000000">range</font> <font color="#434f54">=</font> <font color="#000000">12</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; joystick range of X or Y movement</font>
+                <font color="#00979c">int</font> <font color="#000000">responseDelay</font> <font color="#434f54">=</font> <font color="#000000">5</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; response delay </font>
+                <font color="#00979c">int</font> <font color="#000000">threshold</font> <font color="#434f54">=</font> <font color="#000000">range</font> <font color="#434f54">&#47;</font> <font color="#000000">4</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; resting threshold</font>
+                <font color="#00979c">int</font> <font color="#000000">centre</font> <font color="#434f54">=</font> <font color="#000000">range</font> <font color="#434f54">&#47;</font> <font color="#000000">2</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; resting position value</font>
+                
+                <font color="#00979c">bool</font> <font color="#000000">mouseControl</font> <font color="#434f54">=</font> <font color="#00979c">false</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; boolean value for taking control of mouse</font>
+                <font color="#00979c">int</font> <font color="#000000">lastPushState</font> <font color="#434f54">=</font> <font color="#00979c">LOW</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; previous state of pushbutton</font>
+                
+                <font color="#434f54">&#47;&#47; setup code to run once</font>
+                <font color="#00979c">void</font> <font color="#5e6d03">setup</font><font color="#000000">(</font><font color="#000000">)</font> <font color="#000000">{</font>
+                 &nbsp;<font color="#d35400">pinMode</font><font color="#000000">(</font><font color="#000000">pushPin</font><font color="#434f54">,</font> <font color="#00979c">INPUT</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; the switch pin</font>
+                 &nbsp;<font color="#d35400">pinMode</font><font color="#000000">(</font><font color="#000000">ledPin</font><font color="#434f54">,</font> <font color="#00979c">OUTPUT</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; the LED pin</font>
+                 &nbsp;<b><font color="#d35400">Mouse</font></b><font color="#434f54">.</font><font color="#d35400">begin</font><font color="#000000">(</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; take control of mouse</font>
+                <font color="#000000">}</font>
+                
+                <font color="#434f54">&#47;&#47; main code to run repeatedly</font>
+                <font color="#00979c">void</font> <font color="#5e6d03">loop</font><font color="#000000">(</font><font color="#000000">)</font> <font color="#000000">{</font>
+                 &nbsp;<font color="#00979c">int</font> <font color="#000000">pushState</font> <font color="#434f54">=</font> <font color="#d35400">digitalRead</font><font color="#000000">(</font><font color="#000000">pushPin</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; read pushbutton</font>
+                 &nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><font color="#000000">pushState</font> <font color="#434f54">!=</font> <font color="#000000">lastPushState</font><font color="#000000">)</font> <font color="#000000">{</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; if button state changed from last state</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><font color="#000000">pushState</font> <font color="#434f54">==</font> <font color="#00979c">HIGH</font><font color="#000000">)</font> <font color="#000000">{</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; if buttons state is now HIGH</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#000000">mouseControl</font> <font color="#434f54">=</font> <font color="#434f54">!</font><font color="#000000">mouseControl</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; turn on mouse control</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#d35400">digitalWrite</font><font color="#000000">(</font><font color="#000000">ledPin</font><font color="#434f54">,</font> <font color="#000000">mouseControl</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; turn on LED to indicate mouse state</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#000000">}</font>
+                 &nbsp;<font color="#000000">}</font>
+                 &nbsp;<font color="#000000">lastPushState</font> <font color="#434f54">=</font> <font color="#000000">pushState</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; save last pushbutton state for comparison next loop</font>
+                
+                 &nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><font color="#000000">mouseControl</font><font color="#000000">)</font> <font color="#000000">{</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; if mouse control is on</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#00979c">int</font> <font color="#000000">x</font> <font color="#434f54">=</font> <font color="#000000">mapAxis</font><font color="#000000">(</font><font color="#000000">A0</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; read joystick X axis</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#00979c">int</font> <font color="#000000">y</font> <font color="#434f54">=</font> <font color="#000000">mapAxis</font><font color="#000000">(</font><font color="#000000">A1</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; read joystick Y axis</font>
+                 &nbsp;&nbsp;&nbsp;<b><font color="#d35400">Mouse</font></b><font color="#434f54">.</font><font color="#d35400">move</font><font color="#000000">(</font><font color="#000000">x</font><font color="#434f54">,</font> <font color="#000000">y</font><font color="#434f54">,</font> <font color="#000000">0</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; move the mouse based on X and Y axes reading</font>
+                 &nbsp;<font color="#000000">}</font>
+                
+                 &nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><font color="#d35400">digitalRead</font><font color="#000000">(</font><font color="#000000">mouseButton</font><font color="#000000">)</font> <font color="#434f54">==</font> <font color="#00979c">HIGH</font><font color="#000000">)</font> <font color="#000000">{</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; if joystick pushbutton is pressed</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><font color="#434f54">!</font><b><font color="#d35400">Mouse</font></b><font color="#434f54">.</font><font color="#d35400">isPressed</font><font color="#000000">(</font><font color="#000000">MOUSE_LEFT</font><font color="#000000">)</font><font color="#000000">)</font> <font color="#000000">{</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; if moust not already in left-click</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b><font color="#d35400">Mouse</font></b><font color="#434f54">.</font><font color="#d35400">press</font><font color="#000000">(</font><font color="#000000">MOUSE_LEFT</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; left-click</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#000000">}</font>
+                 &nbsp;<font color="#000000">}</font>
+                 &nbsp;<font color="#5e6d03">else</font> <font color="#000000">{</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><b><font color="#d35400">Mouse</font></b><font color="#434f54">.</font><font color="#d35400">isPressed</font><font color="#000000">(</font><font color="#000000">MOUSE_LEFT</font><font color="#000000">)</font><font color="#000000">)</font> <font color="#000000">{</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; if mouse is already in left-click</font>
+                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b><font color="#d35400">Mouse</font></b><font color="#434f54">.</font><font color="#d35400">release</font><font color="#000000">(</font><font color="#000000">MOUSE_LEFT</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; release left-click</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#000000">}</font>
+                 &nbsp;<font color="#000000">}</font>
+                 &nbsp;<font color="#d35400">delay</font><font color="#000000">(</font><font color="#000000">responseDelay</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; delay</font>
+                <font color="#000000">}</font>
+                
+                
+                <font color="#434f54">&#47;&#47; read X and Y axes and map input to range set out in parametre</font>
+                <font color="#00979c">int</font> <font color="#000000">mapAxis</font><font color="#000000">(</font><font color="#00979c">int</font> <font color="#000000">axisInput</font><font color="#000000">)</font> <font color="#000000">{</font>
+                 &nbsp;<font color="#00979c">int</font> <font color="#000000">reading</font> <font color="#434f54">=</font> <font color="#d35400">analogRead</font><font color="#000000">(</font><font color="#000000">axisInput</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; read joystick analog input</font>
+                 &nbsp;<font color="#000000">reading</font> <font color="#434f54">=</font> <font color="#d35400">map</font><font color="#000000">(</font><font color="#000000">reading</font><font color="#434f54">,</font> <font color="#000000">0</font><font color="#434f54">,</font> <font color="#000000">1023</font><font color="#434f54">,</font> <font color="#000000">0</font><font color="#434f54">,</font> <font color="#000000">range</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; map analog input reading to output range</font>
+                 &nbsp;<font color="#00979c">int</font> <font color="#000000">movement</font> <font color="#434f54">=</font> <font color="#000000">reading</font> <font color="#434f54">-</font> <font color="#000000">centre</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; register joystick movement from resting centre position</font>
+                 &nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><font color="#d35400">abs</font><font color="#000000">(</font><font color="#000000">movement</font><font color="#000000">)</font> <font color="#434f54">&lt;</font> <font color="#000000">threshold</font><font color="#000000">)</font> <font color="#000000">{</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; do not register movement if less than specified threashold</font>
+                 &nbsp;&nbsp;&nbsp;<font color="#000000">movement</font> <font color="#434f54">=</font> <font color="#000000">0</font><font color="#000000">;</font>
+                 &nbsp;<font color="#000000">}</font>
+                 &nbsp;<font color="#5e6d03">return</font> <font color="#000000">movement</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; return movement value</font>
+                <font color="#000000">}</font>
+                
                 <font color="#95a5a6">&#47;*</font>
                 <font color="#95a5a6"> &nbsp;This code is based on an example from the Arduino website.</font>
-                <font color="#95a5a6"></font>
                 <font color="#95a5a6"> &nbsp;</font><u><font color="#95a5a6">http:&#47;&#47;www.arduino.cc&#47;en&#47;Tutorial&#47;JoystickMouseControl</font></u><font color="#95a5a6"></font>
                 <font color="#95a5a6">*&#47;</font>
                 
-                <font color="#5e6d03">#include</font> <font color="#005c5f">&#34;Mouse.h&#34;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; import Mouse library for Arduino Leonardo</font>
-                
-                <font color="#434f54">&#47;&#47; set pin numbers for switch, joystick axes, and LED:</font>
-                <font color="#00979c">const</font> <font color="#00979c">int</font> <font color="#000000">switchPin</font> <font color="#434f54">=</font> <font color="#000000">2</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; switch to turn on and off mouse control</font>
-                <font color="#00979c">const</font> <font color="#00979c">int</font> <font color="#000000">mouseButton</font> <font color="#434f54">=</font> <font color="#000000">3</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; input pin for the mouse pushButton</font>
-                <font color="#00979c">const</font> <font color="#00979c">int</font> <font color="#000000">xAxis</font> <font color="#434f54">=</font> <font color="#000000">A0</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; joystick X axis</font>
-                <font color="#00979c">const</font> <font color="#00979c">int</font> <font color="#000000">yAxis</font> <font color="#434f54">=</font> <font color="#000000">A1</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; joystick Y axis</font>
-                <font color="#00979c">const</font> <font color="#00979c">int</font> <font color="#000000">ledPin</font> <font color="#434f54">=</font> <font color="#000000">5</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; Mouse control LED</font>
-                
-                <font color="#434f54">&#47;&#47; parameters for reading the joystick:</font>
-                <font color="#00979c">int</font> <font color="#000000">range</font> <font color="#434f54">=</font> <font color="#000000">12</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; output range of X or Y movement</font>
-                <font color="#00979c">int</font> <font color="#000000">responseDelay</font> <font color="#434f54">=</font> <font color="#000000">5</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; response delay of the mouse, in ms</font>
-                <font color="#00979c">int</font> <font color="#000000">threshold</font> <font color="#434f54">=</font> <font color="#000000">range</font> <font color="#434f54">&#47;</font> <font color="#000000">4</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; resting threshold</font>
-                <font color="#00979c">int</font> <font color="#000000">center</font> <font color="#434f54">=</font> <font color="#000000">range</font> <font color="#434f54">&#47;</font> <font color="#000000">2</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; resting position value</font>
-                
-                <font color="#00979c">bool</font> <font color="#000000">mouseIsActive</font> <font color="#434f54">=</font> <font color="#00979c">false</font><font color="#000000">;</font> &nbsp;&nbsp;<font color="#434f54">&#47;&#47; whether or not to control the mouse</font>
-                <font color="#00979c">int</font> <font color="#000000">lastSwitchState</font> <font color="#434f54">=</font> <font color="#00979c">LOW</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; previous switch state</font>
-                
-                <font color="#434f54">&#47;&#47; setup code to run once:</font>
-                <font color="#00979c">void</font> <font color="#5e6d03">setup</font><font color="#000000">(</font><font color="#000000">)</font> <font color="#000000">{</font>
-                 &nbsp;<font color="#d35400">pinMode</font><font color="#000000">(</font><font color="#000000">switchPin</font><font color="#434f54">,</font> <font color="#00979c">INPUT_PULLUP</font><font color="#000000">)</font><font color="#000000">;</font><font color="#434f54">&#47;&#47; the switch pin</font>
-                 &nbsp;<font color="#d35400">pinMode</font><font color="#000000">(</font><font color="#000000">ledPin</font><font color="#434f54">,</font> <font color="#00979c">OUTPUT</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; the LED pin</font>
-                 &nbsp;<b><font color="#d35400">Mouse</font></b><font color="#434f54">.</font><font color="#d35400">begin</font><font color="#000000">(</font><font color="#000000">)</font><font color="#000000">;</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; take control of mouse</font>
-                <font color="#000000">}</font>
-                
-                <font color="#434f54">&#47;&#47; main code to run repeatedly:</font>
-                <font color="#00979c">void</font> <font color="#5e6d03">loop</font><font color="#000000">(</font><font color="#000000">)</font> <font color="#000000">{</font>
-                 &nbsp;<font color="#434f54">&#47;&#47; read the switch:</font>
-                 &nbsp;<font color="#00979c">int</font> <font color="#000000">switchState</font> <font color="#434f54">=</font> <font color="#d35400">digitalRead</font><font color="#000000">(</font><font color="#000000">switchPin</font><font color="#000000">)</font><font color="#000000">;</font>
-                 &nbsp;<font color="#434f54">&#47;&#47; if it&#39;s changed and it&#39;s high, toggle the mouse state:</font>
-                 &nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><font color="#000000">switchState</font> <font color="#434f54">!=</font> <font color="#000000">lastSwitchState</font><font color="#000000">)</font> <font color="#000000">{</font>
-                 &nbsp;&nbsp;&nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><font color="#000000">switchState</font> <font color="#434f54">==</font> <font color="#00979c">HIGH</font><font color="#000000">)</font> <font color="#000000">{</font>
-                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#000000">mouseIsActive</font> <font color="#434f54">=</font> <font color="#434f54">!</font><font color="#000000">mouseIsActive</font><font color="#000000">;</font>
-                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; turn on LED to indicate mouse state:</font>
-                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#d35400">digitalWrite</font><font color="#000000">(</font><font color="#000000">ledPin</font><font color="#434f54">,</font> <font color="#000000">mouseIsActive</font><font color="#000000">)</font><font color="#000000">;</font>
-                 &nbsp;&nbsp;&nbsp;<font color="#000000">}</font>
-                 &nbsp;<font color="#000000">}</font>
-                 &nbsp;<font color="#434f54">&#47;&#47; save switch state for next comparison:</font>
-                 &nbsp;<font color="#000000">lastSwitchState</font> <font color="#434f54">=</font> <font color="#000000">switchState</font><font color="#000000">;</font>
-                
-                 &nbsp;<font color="#434f54">&#47;&#47; read and scale the two axes:</font>
-                 &nbsp;<font color="#00979c">int</font> <font color="#000000">xReading</font> <font color="#434f54">=</font> <font color="#000000">readAxis</font><font color="#000000">(</font><font color="#000000">A0</font><font color="#000000">)</font><font color="#000000">;</font>
-                 &nbsp;<font color="#00979c">int</font> <font color="#000000">yReading</font> <font color="#434f54">=</font> <font color="#000000">readAxis</font><font color="#000000">(</font><font color="#000000">A1</font><font color="#000000">)</font><font color="#000000">;</font>
-                
-                 &nbsp;<font color="#434f54">&#47;&#47; if the mouse control state is active, move the mouse:</font>
-                 &nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><font color="#000000">mouseIsActive</font><font color="#000000">)</font> <font color="#000000">{</font>
-                 &nbsp;&nbsp;&nbsp;<b><font color="#d35400">Mouse</font></b><font color="#434f54">.</font><font color="#d35400">move</font><font color="#000000">(</font><font color="#000000">xReading</font><font color="#434f54">,</font> <font color="#000000">yReading</font><font color="#434f54">,</font> <font color="#000000">0</font><font color="#000000">)</font><font color="#000000">;</font>
-                 &nbsp;<font color="#000000">}</font>
-                
-                 &nbsp;<font color="#434f54">&#47;&#47; read the mouse button and click or not click:</font>
-                 &nbsp;<font color="#434f54">&#47;&#47; if the mouse button is pressed:</font>
-                 &nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><font color="#d35400">digitalRead</font><font color="#000000">(</font><font color="#000000">mouseButton</font><font color="#000000">)</font> <font color="#434f54">==</font> <font color="#00979c">HIGH</font><font color="#000000">)</font> <font color="#000000">{</font>
-                 &nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; if the mouse is not pressed, press it:</font>
-                 &nbsp;&nbsp;&nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><font color="#434f54">!</font><b><font color="#d35400">Mouse</font></b><font color="#434f54">.</font><font color="#d35400">isPressed</font><font color="#000000">(</font><font color="#000000">MOUSE_LEFT</font><font color="#000000">)</font><font color="#000000">)</font> <font color="#000000">{</font>
-                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b><font color="#d35400">Mouse</font></b><font color="#434f54">.</font><font color="#d35400">press</font><font color="#000000">(</font><font color="#000000">MOUSE_LEFT</font><font color="#000000">)</font><font color="#000000">;</font>
-                 &nbsp;&nbsp;&nbsp;<font color="#000000">}</font>
-                 &nbsp;<font color="#000000">}</font>
-                 &nbsp;<font color="#434f54">&#47;&#47; else the mouse button is not pressed:</font>
-                 &nbsp;<font color="#5e6d03">else</font> <font color="#000000">{</font>
-                 &nbsp;&nbsp;&nbsp;<font color="#434f54">&#47;&#47; if the mouse is pressed, release it:</font>
-                 &nbsp;&nbsp;&nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><b><font color="#d35400">Mouse</font></b><font color="#434f54">.</font><font color="#d35400">isPressed</font><font color="#000000">(</font><font color="#000000">MOUSE_LEFT</font><font color="#000000">)</font><font color="#000000">)</font> <font color="#000000">{</font>
-                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b><font color="#d35400">Mouse</font></b><font color="#434f54">.</font><font color="#d35400">release</font><font color="#000000">(</font><font color="#000000">MOUSE_LEFT</font><font color="#000000">)</font><font color="#000000">;</font>
-                 &nbsp;&nbsp;&nbsp;<font color="#000000">}</font>
-                 &nbsp;<font color="#000000">}</font>
-                
-                 &nbsp;<font color="#d35400">delay</font><font color="#000000">(</font><font color="#000000">responseDelay</font><font color="#000000">)</font><font color="#000000">;</font>
-                <font color="#000000">}</font>
-                
-                
-                <font color="#434f54">&#47;&#47; reads an axis (0 or 1 for x or y) and scales the analog input range to a range from 0 to &lt;range&gt;:</font>
-                <font color="#00979c">int</font> <font color="#000000">readAxis</font><font color="#000000">(</font><font color="#00979c">int</font> <font color="#000000">thisAxis</font><font color="#000000">)</font> <font color="#000000">{</font>
-                 &nbsp;<font color="#434f54">&#47;&#47; read the analog input:</font>
-                 &nbsp;<font color="#00979c">int</font> <font color="#000000">reading</font> <font color="#434f54">=</font> <font color="#d35400">analogRead</font><font color="#000000">(</font><font color="#000000">thisAxis</font><font color="#000000">)</font><font color="#000000">;</font>
-                
-                 &nbsp;<font color="#434f54">&#47;&#47; map the reading from the analog input range to the output range:</font>
-                 &nbsp;<font color="#000000">reading</font> <font color="#434f54">=</font> <font color="#d35400">map</font><font color="#000000">(</font><font color="#000000">reading</font><font color="#434f54">,</font> <font color="#000000">0</font><font color="#434f54">,</font> <font color="#000000">1023</font><font color="#434f54">,</font> <font color="#000000">0</font><font color="#434f54">,</font> <font color="#000000">range</font><font color="#000000">)</font><font color="#000000">;</font>
-                
-                 &nbsp;<font color="#434f54">&#47;&#47; if the output reading is outside from the rest position threshold, use it:</font>
-                 &nbsp;<font color="#00979c">int</font> <font color="#000000">distance</font> <font color="#434f54">=</font> <font color="#000000">reading</font> <font color="#434f54">-</font> <font color="#000000">center</font><font color="#000000">;</font>
-                
-                 &nbsp;<font color="#5e6d03">if</font> <font color="#000000">(</font><font color="#d35400">abs</font><font color="#000000">(</font><font color="#000000">distance</font><font color="#000000">)</font> <font color="#434f54">&lt;</font> <font color="#000000">threshold</font><font color="#000000">)</font> <font color="#000000">{</font>
-                 &nbsp;&nbsp;&nbsp;<font color="#000000">distance</font> <font color="#434f54">=</font> <font color="#000000">0</font><font color="#000000">;</font>
-                 &nbsp;<font color="#000000">}</font>
-                
-                 &nbsp;<font color="#434f54">&#47;&#47; return the distance for this axis:</font>
-                 &nbsp;<font color="#5e6d03">return</font> <font color="#000000">distance</font><font color="#000000">;</font>
-                <font color="#000000">}</font>
-                
                 </pre>
+        </p>
+        <p>
+            <img src="final/final_case.jpg" width=400></a>
+        </p>
+        <p>
+            I tried to 3D print a casing but it turned out to be a few millimetres too small…
+            I meant to readjust and print again but campus got closed...
         </p>
     </div>
 

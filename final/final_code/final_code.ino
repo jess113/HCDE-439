@@ -1,115 +1,70 @@
-/*
-  JoystickMouseControl
-
-  Controls the mouse from a joystick on an Arduino Leonardo, Micro or Due.
-  Uses a pushbutton to turn on and off mouse control, and a second pushbutton
-  to click the left mouse button.
-
-  Hardware:
-  - 2-axis joystick connected to pins A0 and A1
-  - pushbuttons connected to pin D2 and D3
-
-  The mouse movement is always relative. This sketch reads two analog inputs
-  that range from 0 to 1023 (or less on either end) and translates them into
-  ranges of -6 to 6.
-  The sketch assumes that the joystick resting values are around the middle of
-  the range, but that they vary within a threshold.
-
-  WARNING: When you use the Mouse.move() command, the Arduino takes over your
-  mouse! Make sure you have control before you use the command. This sketch
-  includes a pushbutton to toggle the mouse control state, so you can turn on
-  and off mouse control.
-
-
-  This code is based on an example from the Arduino website.
-
-  http://www.arduino.cc/en/Tutorial/JoystickMouseControl
-*/
-
 #include "Mouse.h"            // import Mouse library for Arduino Leonardo
 
-// set pin numbers for switch, joystick axes, and LED:
-const int switchPin = 2;      // switch to turn on and off mouse control
-const int mouseButton = 3;    // input pin for the mouse pushButton
+// set input pins and parametres
+const int pushPin = 2;        // pushbutton to turn on and off mouse control
+const int mouseButton = 3;    // joystick pushbutton
 const int xAxis = A0;         // joystick X axis
 const int yAxis = A1;         // joystick Y axis
-const int ledPin = 5;         // Mouse control LED
+const int ledPin = 5;         // LED indicating mouse control
 
-// parameters for reading the joystick:
-int range = 12;               // output range of X or Y movement
-int responseDelay = 5;        // response delay of the mouse, in ms
+int range = 12;               // joystick range of X or Y movement
+int responseDelay = 5;        // response delay 
 int threshold = range / 4;    // resting threshold
-int center = range / 2;       // resting position value
+int centre = range / 2;       // resting position value
 
-bool mouseIsActive = false;   // whether or not to control the mouse
-int lastSwitchState = LOW;    // previous switch state
+bool mouseControl = false;    // boolean value for taking control of mouse
+int lastPushState = LOW;      // previous state of pushbutton
 
-// setup code to run once:
+// setup code to run once
 void setup() {
-  pinMode(switchPin, INPUT);       // the switch pin
-  pinMode(ledPin, OUTPUT);         // the LED pin
-  Mouse.begin();                   // take control of mouse
+  pinMode(pushPin, INPUT);    // the switch pin
+  pinMode(ledPin, OUTPUT);    // the LED pin
+  Mouse.begin();              // take control of mouse
 }
 
-// main code to run repeatedly:
+// main code to run repeatedly
 void loop() {
-  // read the switch:
-  int switchState = digitalRead(switchPin);
-  // if it's changed and it's high, toggle the mouse state:
-  if (switchState != lastSwitchState) {
-    if (switchState == HIGH) {
-      mouseIsActive = !mouseIsActive;
-      // turn on LED to indicate mouse state:
-      digitalWrite(ledPin, mouseIsActive);
+  int pushState = digitalRead(pushPin);         // read pushbutton
+  if (pushState != lastPushState) {             // if button state changed from last state
+    if (pushState == HIGH) {                    // if buttons state is now HIGH
+      mouseControl = !mouseControl;             // turn on mouse control
+      digitalWrite(ledPin, mouseControl);       // turn on LED to indicate mouse state
     }
   }
-  // save switch state for next comparison:
-  lastSwitchState = switchState;
+  lastPushState = pushState;                    // save last pushbutton state for comparison next loop
 
-  // read and scale the two axes:
-  int xReading = readAxis(A0);
-  int yReading = readAxis(A1);
-
-  // if the mouse control state is active, move the mouse:
-  if (mouseIsActive) {
-    Mouse.move(xReading, yReading, 0);
+  if (mouseControl) {                           // if mouse control is on
+    int x = mapAxis(A0);                        // read joystick X axis
+    int y = mapAxis(A1);                        // read joystick Y axis
+    Mouse.move(x, y, 0);                        // move the mouse based on X and Y axes reading
   }
 
-  // read the mouse button and click or not click:
-  // if the mouse button is pressed:
-  if (digitalRead(mouseButton) == HIGH) {
-    // if the mouse is not pressed, press it:
-    if (!Mouse.isPressed(MOUSE_LEFT)) {
-      Mouse.press(MOUSE_LEFT);
+  if (digitalRead(mouseButton) == HIGH) {       // if joystick pushbutton is pressed
+    if (!Mouse.isPressed(MOUSE_LEFT)) {         // if moust not already in left-click
+      Mouse.press(MOUSE_LEFT);                  // left-click
     }
   }
-  // else the mouse button is not pressed:
   else {
-    // if the mouse is pressed, release it:
-    if (Mouse.isPressed(MOUSE_LEFT)) {
-      Mouse.release(MOUSE_LEFT);
+    if (Mouse.isPressed(MOUSE_LEFT)) {          // if mouse is already in left-click
+      Mouse.release(MOUSE_LEFT);                // release left-click
     }
   }
-
-  delay(responseDelay);
+  delay(responseDelay);                         // delay
 }
 
 
-// reads an axis (0 or 1 for x or y) and scales the analog input range to a range from 0 to <range>:
-int readAxis(int thisAxis) {
-  // read the analog input:
-  int reading = analogRead(thisAxis);
-
-  // map the reading from the analog input range to the output range:
-  reading = map(reading, 0, 1023, 0, range);
-
-  // if the output reading is outside from the rest position threshold, use it:
-  int distance = reading - center;
-
-  if (abs(distance) < threshold) {
-    distance = 0;
+// read X and Y axes and map input to range set out in parametre
+int mapAxis(int axisInput) {
+  int reading = analogRead(axisInput);          // read joystick analog input
+  reading = map(reading, 0, 1023, 0, range);    // map analog input reading to output range
+  int movement = reading - centre;              // register joystick movement from resting centre position
+  if (abs(movement) < threshold) {              // do not register movement if less than specified threashold
+    movement = 0;
   }
-
-  // return the distance for this axis:
-  return distance;
+  return movement;                              // return movement value
 }
+
+/*
+  This code is based on an example from the Arduino website.
+  http://www.arduino.cc/en/Tutorial/JoystickMouseControl
+*/
